@@ -19,7 +19,15 @@ router.get(
       const type = req.query.type;
       const offset = (page - 1) * limit;
 
-      let whereClause = "(t.sender_id = $1 OR t.recipient_id = $1)";
+      // Filter transactions based on type:
+      // - send_money: only show if user is sender
+      // - receive_money: only show if user is recipient
+      // - add_money: only show if user is sender
+      let whereClause = `(
+        (t.transaction_type = 'send_money' AND t.sender_id = $1) OR
+        (t.transaction_type = 'receive_money' AND t.recipient_id = $1) OR
+        (t.transaction_type = 'add_money' AND t.sender_id = $1)
+      )`;
       let queryParams = [userId];
 
       if (type) {
