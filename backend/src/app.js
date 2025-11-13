@@ -75,7 +75,10 @@ const PORT = process.env.PORT || 3001;
 async function startServer() {
   try {
     await connectDB();
-    await connectRedis();
+    // Redis connection is optional - don't fail if it doesn't connect
+    await connectRedis().catch((error) => {
+      console.warn("⚠️  Continuing without Redis:", error.message);
+    });
 
     app.listen(PORT, () => {
       console.log(`🚀 Digital Wallet API running on port ${PORT}`);

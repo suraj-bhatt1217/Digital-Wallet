@@ -1,7 +1,7 @@
 // src/routes/wallet.js
 const express = require("express");
 const { pool } = require("../utils/database");
-const { client: redisClient } = require("../utils/redis");
+const { get: redisGet, setEx: redisSetEx, del: redisDel } = require("../utils/redis");
 const { authenticateToken } = require("../middleware/auth");
 const {
   addMoneyValidation,
@@ -14,9 +14,9 @@ const router = express.Router();
 // Get Balance
 router.get("/balance", authenticateToken, async (req, res) => {
   try {
-    // Try to get balance from Redis cache first
+    // Try to get balance from Redis cache first (if available)
     const cacheKey = `balance:${req.user.id}`;
-    const cachedBalance = await redisClient.get(cacheKey);
+    const cachedBalance = await redisGet(cacheKey);
 
     if (cachedBalance) {
       return res.json({
@@ -44,8 +44,8 @@ router.get("/balance", authenticateToken, async (req, res) => {
 
     const balance = parseFloat(result.rows[0].balance);
 
-    // Cache balance for 5 minutes
-    await redisClient.setEx(cacheKey, 300, balance.toString());
+    // Cache balance for 5 minutes (if Redis is available)
+    await redisSetEx(cacheKey, 300, balance.toString());
 
     res.json({
       success: true,
@@ -100,8 +100,8 @@ router.post(
 
       await client.query("COMMIT");
 
-      // Clear balance cache
-      await redisClient.del(`balance:${userId}`);
+      // Clear balance cache (if Redis is available)
+      await redisDel(`balance:${userId}`);
 
       res.json({
         success: true,
@@ -229,10 +229,10 @@ router.post(
 
       await client.query("COMMIT");
 
-      // Clear both users' balance cache
+      // Clear both users' balance cache (if Redis is available)
       await Promise.all([
-        redisClient.del(`balance:${senderId}`),
-        redisClient.del(`balance:${recipientId}`),
+        redisDel(`balance:${senderId}`),
+        redisDel(`balance:${recipientId}`),
       ]);
 
       res.json({

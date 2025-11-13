@@ -3,7 +3,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { pool } = require("../utils/database");
-const { client: redisClient } = require("../utils/redis");
+const { setEx: redisSetEx, del: redisDel } = require("../utils/redis");
 const {
   registerValidation,
   loginValidation,
@@ -133,8 +133,8 @@ router.post("/login", loginValidation, async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 
-    // Cache user session in Redis
-    await redisClient.setEx(
+    // Cache user session in Redis (if available)
+    await redisSetEx(
       `session:${user.id}`,
       604800,
       JSON.stringify({
@@ -169,8 +169,8 @@ router.post("/login", loginValidation, async (req, res) => {
 // Logout
 router.post("/logout", authenticateToken, async (req, res) => {
   try {
-    // Remove session from Redis
-    await redisClient.del(`session:${req.user.id}`);
+    // Remove session from Redis (if available)
+    await redisDel(`session:${req.user.id}`);
 
     res.json({
       success: true,
