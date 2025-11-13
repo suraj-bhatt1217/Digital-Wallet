@@ -404,11 +404,11 @@ export default function DigitalWalletApp({
       onConfirm: async () => {
         setIsLoading(true);
         try {
-          await apiCall("/wallet/send-money", {
+          const response = await apiCall("/wallet/send-money", {
             method: "POST",
             body: JSON.stringify({
               recipientId: selectedRecipient.id,
-              amount,
+              amount: parseFloat(amount.toString()),
               note: sendNote || `Payment to ${selectedRecipient.name}`,
             }),
           });

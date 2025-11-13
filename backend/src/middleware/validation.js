@@ -48,8 +48,17 @@ const addMoneyValidation = [
 const sendMoneyValidation = [
   body("recipientId").isUUID().withMessage("Invalid recipient ID"),
   body("amount")
-    .isFloat({ min: 1, max: 50000 })
-    .withMessage("Amount must be between ₹1 and ₹50,000"),
+    .custom((value) => {
+      const num = parseFloat(value);
+      if (isNaN(num) || num <= 0) {
+        throw new Error("Amount must be a positive number");
+      }
+      if (num < 1 || num > 50000) {
+        throw new Error("Amount must be between ₹1 and ₹50,000");
+      }
+      return true;
+    })
+    .toFloat(),
   body("note")
     .optional()
     .trim()

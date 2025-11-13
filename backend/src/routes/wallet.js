@@ -167,9 +167,12 @@ router.post(
         });
       }
 
-      // Check if recipient exists
+      // Check if recipient exists and has a wallet
       const recipient = await client.query(
-        "SELECT id, name, email FROM users WHERE id = $1 AND is_active = true",
+        `SELECT u.id, u.name, u.email, w.id as wallet_id
+         FROM users u
+         LEFT JOIN wallets w ON w.user_id = u.id
+         WHERE u.id = $1 AND u.is_active = true`,
         [recipientId]
       );
 
@@ -179,6 +182,14 @@ router.post(
           success: false,
           message: "Recipient not found",
         });
+      }
+
+      // Ensure recipient has a wallet (create if missing)
+      if (!recipient.rows[0].wallet_id) {
+        await client.query(
+          "INSERT INTO wallets (user_id, balance) VALUES ($1, $2)",
+          [recipientId, 0.0]
+        );
       }
 
       const referenceId = `SEND_${Date.now()}_${Math.random()
@@ -256,7 +267,7 @@ router.post(
       console.error("Send money error:", error);
       res.status(500).json({
         success: false,
-        message: "Failed to send money",
+        message: error.message || "Failed to send money",
       });
     } finally {
       client.release();
