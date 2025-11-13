@@ -1,4 +1,3 @@
-import * as React from "react";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
@@ -20,15 +19,14 @@ import {
   Eye,
   EyeOff,
   Home,
-  Filter,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { ScrollArea } from "./ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +35,6 @@ import {
   DialogFooter,
 } from "./ui/dialog";
 import { Badge } from "./ui/badge";
-import { Separator } from "./ui/separator";
 import { Skeleton } from "./ui/skeleton";
 import {
   DropdownMenu,
@@ -564,14 +561,17 @@ export default function DigitalWalletApp({
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
     },
     exit: {
       opacity: 0,
       y: -20,
       scale: 0.98,
-      transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] },
     },
+  };
+  
+  const screenTransition = {
+    duration: 0.4,
+    ease: "easeOut" as const,
   };
 
   // Glass button variants
@@ -695,6 +695,7 @@ export default function DigitalWalletApp({
       initial="initial"
       animate="animate"
       exit="exit"
+      transition={screenTransition}
       className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6"
     >
       <Card className="w-full max-w-md bg-slate-900/40 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden">
@@ -819,6 +820,7 @@ export default function DigitalWalletApp({
       initial="initial"
       animate="animate"
       exit="exit"
+      transition={screenTransition}
       className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-6"
     >
       <Card className="w-full max-w-md bg-slate-900/40 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-3xl overflow-hidden">
@@ -977,6 +979,7 @@ export default function DigitalWalletApp({
       initial="initial"
       animate="animate"
       exit="exit"
+      transition={screenTransition}
       className="p-6 space-y-8 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
     >
       <div className="max-w-7xl mx-auto space-y-8">
@@ -1127,6 +1130,7 @@ export default function DigitalWalletApp({
       initial="initial"
       animate="animate"
       exit="exit"
+      transition={screenTransition}
       className="p-6 space-y-8 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
     >
       <div className="max-w-2xl mx-auto space-y-8">
@@ -1332,6 +1336,7 @@ export default function DigitalWalletApp({
       initial="initial"
       animate="animate"
       exit="exit"
+      transition={screenTransition}
       className="p-6 space-y-8 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
     >
       <div className="max-w-2xl mx-auto space-y-8">
@@ -1476,6 +1481,7 @@ export default function DigitalWalletApp({
       initial="initial"
       animate="animate"
       exit="exit"
+      transition={screenTransition}
       className="p-6 space-y-8 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
     >
       <div className="max-w-4xl mx-auto space-y-8">
@@ -1735,7 +1741,7 @@ export default function DigitalWalletApp({
             initial={{ opacity: 0, x: 100, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 100, scale: 0.9 }}
-            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className={cn(
               "flex items-center gap-4 p-6 rounded-2xl shadow-2xl max-w-sm backdrop-blur-2xl border",
               toast.type === "success" &&
