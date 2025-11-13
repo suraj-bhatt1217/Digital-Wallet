@@ -404,7 +404,7 @@ export default function DigitalWalletApp({
       onConfirm: async () => {
         setIsLoading(true);
         try {
-          const response = await apiCall("/wallet/send-money", {
+          await apiCall("/wallet/send-money", {
             method: "POST",
             body: JSON.stringify({
               recipientId: selectedRecipient.id,
