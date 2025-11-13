@@ -192,9 +192,11 @@ router.post(
         );
       }
 
-      const referenceId = `SEND_${Date.now()}_${Math.random()
+      const baseReferenceId = `SEND_${Date.now()}_${Math.random()
         .toString(36)
         .substr(2, 9)}`;
+      const sendReferenceId = `${baseReferenceId}_SEND`;
+      const receiveReferenceId = `${baseReferenceId}_RECV`;
 
       // Create send transaction
       const sendTransactionResult = await client.query(
@@ -207,7 +209,7 @@ router.post(
           "send_money",
           "completed",
           note,
-          referenceId,
+          sendReferenceId,
         ]
       );
 
@@ -222,7 +224,7 @@ router.post(
           "receive_money",
           "completed",
           note,
-          referenceId,
+          receiveReferenceId,
         ]
       );
 
@@ -259,7 +261,7 @@ router.post(
             email: recipient.rows[0].email,
           },
           note,
-          referenceId,
+          referenceId: sendReferenceId,
         },
       });
     } catch (error) {
