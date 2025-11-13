@@ -4,9 +4,10 @@ const { body, query, validationResult } = require("express-validator");
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    const errorMessages = errors.array().map(err => err.msg).join(", ");
     return res.status(400).json({
       success: false,
-      message: "Validation failed",
+      message: errorMessages || "Validation failed",
       errors: errors.array(),
     });
   }
@@ -23,8 +24,8 @@ const registerValidation = [
     .isLength({ min: 2 })
     .withMessage("Name must be at least 2 characters"),
   body("phone")
-    .isMobilePhone("en-IN")
-    .withMessage("Invalid Indian phone number"),
+    .isMobilePhone("any", { strictMode: false })
+    .withMessage("Invalid phone number format"),
   handleValidationErrors,
 ];
 
