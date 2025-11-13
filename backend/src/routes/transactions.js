@@ -27,8 +27,8 @@ router.get(
       let queryParams = [userId];
 
       if (type === "sent") {
-        whereClause = `t.sender_id = $1 AND t.transaction_type IN ($2, $3)`;
-        queryParams.push("send_money", "add_money");
+        whereClause = `t.sender_id = $1 AND t.transaction_type = $2`;
+        queryParams.push("send_money");
       } else if (type === "received") {
         whereClause = `t.recipient_id = $1 AND t.transaction_type = $2`;
         queryParams.push("receive_money");
@@ -45,6 +45,11 @@ router.get(
       }
 
       // Get transactions with user details
+      const limitParamIndex = queryParams.length + 1;
+      const offsetParamIndex = queryParams.length + 2;
+      
+      queryParams.push(limit, offset);
+
       const transactionsQuery = `
       SELECT 
         t.id,
@@ -64,17 +69,16 @@ router.get(
       LEFT JOIN users recipient ON t.recipient_id = recipient.id
       WHERE ${whereClause}
       ORDER BY t.created_at DESC
-      LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}
+      LIMIT $${limitParamIndex} OFFSET $${offsetParamIndex}
     `;
-
-      queryParams.push(limit, offset);
 
       const transactionsResult = await pool.query(
         transactionsQuery,
         queryParams
       );
 
-      // Get total count for pagination
+      // Get total count for pagination (without limit/offset)
+      const countParams = queryParams.slice(0, -2);
       const countQuery = `
       SELECT COUNT(*) as total
       FROM transactions t
@@ -83,7 +87,7 @@ router.get(
 
       const countResult = await pool.query(
         countQuery,
-        queryParams.slice(0, -2)
+        countParams
       );
       const total = parseInt(countResult.rows[0].total);
 

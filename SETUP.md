@@ -104,3 +104,4 @@ The frontend should start on `http://localhost:5173` (or another port)
 - These are normal! The app works fine without Redis
 - Just ignore the Redis warnings
 
+
