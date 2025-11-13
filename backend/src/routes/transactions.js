@@ -23,25 +23,25 @@ router.get(
       // - send_money: only show if user is sender
       // - receive_money: only show if user is recipient
       // - add_money: only show if user is sender
-      let whereClause = `(
-        (t.transaction_type = 'send_money' AND t.sender_id = $1) OR
-        (t.transaction_type = 'receive_money' AND t.recipient_id = $1) OR
-        (t.transaction_type = 'add_money' AND t.sender_id = $1)
-      )`;
+      let whereClause;
       let queryParams = [userId];
 
-      if (type) {
-        if (type === "sent") {
-          whereClause +=
-            " AND t.sender_id = $1 AND t.transaction_type IN ($2, $3)";
-          queryParams.push("send_money", "add_money");
-        } else if (type === "received") {
-          whereClause += " AND t.recipient_id = $1 AND t.transaction_type = $2";
-          queryParams.push("receive_money");
-        } else if (type === "add_money") {
-          whereClause += " AND t.sender_id = $1 AND t.transaction_type = $2";
-          queryParams.push("add_money");
-        }
+      if (type === "sent") {
+        whereClause = `t.sender_id = $1 AND t.transaction_type IN ($2, $3)`;
+        queryParams.push("send_money", "add_money");
+      } else if (type === "received") {
+        whereClause = `t.recipient_id = $1 AND t.transaction_type = $2`;
+        queryParams.push("receive_money");
+      } else if (type === "add_money") {
+        whereClause = `t.sender_id = $1 AND t.transaction_type = $2`;
+        queryParams.push("add_money");
+      } else {
+        // No filter - show all relevant transactions
+        whereClause = `(
+          (t.transaction_type = 'send_money' AND t.sender_id = $1) OR
+          (t.transaction_type = 'receive_money' AND t.recipient_id = $1) OR
+          (t.transaction_type = 'add_money' AND t.sender_id = $1)
+        )`;
       }
 
       // Get transactions with user details
