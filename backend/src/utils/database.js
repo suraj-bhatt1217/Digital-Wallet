@@ -10,7 +10,11 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000, // Increased timeout for cloud databases
+  // SSL is required for cloud databases like Neon
+  ssl: process.env.DB_SSL === 'true' || process.env.DB_HOST?.includes('neon.tech') || process.env.DB_HOST?.includes('supabase.co') 
+    ? { rejectUnauthorized: false } 
+    : false,
 });
 
 async function connectDB() {
