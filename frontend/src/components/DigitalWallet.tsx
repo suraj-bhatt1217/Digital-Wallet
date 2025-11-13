@@ -191,6 +191,21 @@ export default function DigitalWalletApp({
     }
   }, []);
 
+  // Scroll to top when switching to dashboard
+  useEffect(() => {
+    if (currentScreen === "dashboard") {
+      // Use setTimeout to ensure DOM has updated
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "instant" });
+        // Also scroll the main element if it exists
+        const mainElement = document.querySelector("main");
+        if (mainElement) {
+          mainElement.scrollTo({ top: 0, behavior: "instant" });
+        }
+      }, 0);
+    }
+  }, [currentScreen]);
+
   // Load user profile
   const loadUserProfile = async () => {
     try {
